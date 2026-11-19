@@ -31,21 +31,33 @@ Models: GPT-2 (124M, 355M, 774M, 1.5B), LLaMA-3.2 (1B, 3B), Gemma-3 (1B), Mamba 
 
 ```mermaid
 flowchart LR
-    A[stimuli, fMRI data<br/>and 12 LLMs] --> B[alignment analyses<br/>GPU, one SLURM task per model]
-    B --> C[(result tables<br/>data/results/)]
-    C --> D[statistics and figures<br/>CPU]
+    subgraph IN["Inputs"]
+        direction TB
+        S["stimuli and word norms<br/>data/"]
+        F["fMRI responses<br/>data/pereira_language.npz"]
+        M["12 LLMs<br/>(Hugging Face)"]
+    end
+    subgraph GPU["GPU: one SLURM task per model (run_all_analyses.sh)"]
+        direction TB
+        L["minimal pairs<br/>LANG_selectivity.py"]
+        P["brain<br/>PEREIRA_alignment_gpu.py"]
+        MM["model-to-model<br/>other/model_model_alignment.py"]
+        SE["word norms<br/>SEM_alignment.py"]
+        SP["readout sparsity (SI)<br/>other/sparsity_analysis.py"]
+        J["one rotation for all features (SI)<br/>other/JOINT_optimal_features.py"]
+        L --> P --> MM --> SE --> SP --> J
+    end
+    CK["Pythia training checkpoints<br/>other/model_model_checkpoints.py<br/>other/model_model_checkpoints_rsa.py"]
+    R[("result tables<br/>data/results/")]
+    subgraph CPU["CPU"]
+        direction TB
+        ST["statistics<br/>other/paper_stats.py"]
+        FG["figures<br/>other/make_paper_figures.py<br/>other/make_aggregate_plots.py"]
+    end
+    IN --> GPU --> R
+    IN --> CK --> R
+    R --> CPU
 ```
-
-| Analysis | Script |
-|---|---|
-| Model-to-model | `other/model_model_alignment.py` |
-| Model-to-brain | `PEREIRA_alignment_gpu.py` |
-| Model-to-feature (minimal pairs / word norms) | `LANG_selectivity.py` / `SEM_alignment.py` |
-| One rotation for all features (SI) | `other/JOINT_optimal_features.py` |
-| Readout sparsity | `other/sparsity_analysis.py` |
-| Training dynamics and RSA (Pythia checkpoints) | `other/model_model_checkpoints.py`, `other/model_model_checkpoints_rsa.py` |
-| Statistics | `other/paper_stats.py` |
-| Figures | `other/make_paper_figures.py`, `other/make_aggregate_plots.py` |
 
 The matching and rotation code is in `privileged_axes/` (adapted from Khosla et al., 2024). `run_all_analyses.sh` submits all GPU analyses to SLURM.
 
