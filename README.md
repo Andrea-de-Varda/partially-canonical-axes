@@ -31,35 +31,42 @@ Models: GPT-2 (124M, 355M, 774M, 1.5B), LLaMA-3.2 (1B, 3B), Gemma-3 (1B), Mamba 
 
 ```mermaid
 flowchart LR
-    subgraph IN["Inputs"]
+    IN["stimuli and word norms<br/>fMRI responses<br/>12 LLMs"]
+    subgraph GPU["GPU: SLURM array of 22 tasks"]
         direction TB
-        S["stimuli and word norms<br/>data/"]
-        F["fMRI responses<br/>data/pereira_language.npz"]
-        M["12 LLMs<br/>(Hugging Face)"]
+        subgraph PM["12 tasks, one per model"]
+            direction TB
+            L["minimal pairs"] --> P["brain"] --> MM["model-to-model"] --> SE["word norms"] --> SP["readout sparsity"] --> J["joint rotation (SI)"]
+        end
+        subgraph CK["10 tasks, one per Pythia seed pair"]
+            direction TB
+            T["alignment across training"]
+            RSA["RSA control (SI)"]
+        end
     end
-    subgraph GPU["GPU: one SLURM task per model (run_all_analyses.sh)"]
-        direction TB
-        L["minimal pairs<br/>LANG_selectivity.py"]
-        P["brain<br/>PEREIRA_alignment_gpu.py"]
-        MM["model-to-model<br/>other/model_model_alignment.py"]
-        SE["word norms<br/>SEM_alignment.py"]
-        SP["readout sparsity (SI)<br/>other/sparsity_analysis.py"]
-        J["one rotation for all features (SI)<br/>other/JOINT_optimal_features.py"]
-        L --> P --> MM --> SE --> SP --> J
-    end
-    CK["Pythia training checkpoints<br/>other/model_model_checkpoints.py<br/>other/model_model_checkpoints_rsa.py"]
     R[("result tables<br/>data/results/")]
     subgraph CPU["CPU"]
         direction TB
-        ST["statistics<br/>other/paper_stats.py"]
-        FG["figures<br/>other/make_paper_figures.py<br/>other/make_aggregate_plots.py"]
+        ST["statistics"]
+        FG["figures"]
     end
-    IN --> GPU --> R
-    IN --> CK --> R
-    R --> CPU
+    IN --> GPU --> R --> CPU
 ```
 
-The matching and rotation code is in `privileged_axes/` (adapted from Khosla et al., 2024). `run_all_analyses.sh` submits all GPU analyses to SLURM.
+| Step | Script |
+|---|---|
+| Submit the GPU array | `run_all_analyses.sh` (tasks listed in `pipeline/stage_all.txt`) |
+| Minimal pairs (Wug, BLiMP, hypernymy) | `LANG_selectivity.py` |
+| Brain | `PEREIRA_alignment_gpu.py` |
+| Model-to-model | `other/model_model_alignment.py` |
+| Word norms (perceptual, affective) | `SEM_alignment.py` |
+| Readout sparsity | `other/sparsity_analysis.py` |
+| Joint rotation across feature tasks (SI) | `other/JOINT_optimal_features.py` |
+| Alignment across training / RSA control (SI) | `other/model_model_checkpoints.py` / `other/model_model_checkpoints_rsa.py` |
+| Statistics | `other/paper_stats.py` |
+| Figures | `other/make_paper_figures.py`, `other/make_aggregate_plots.py` |
+
+The matching and rotation code is in `privileged_axes/` (adapted from Khosla et al., 2024).
 
 ## Reproducing the statistics and figures (CPU, it only takes a few minutes)
 
