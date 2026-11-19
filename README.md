@@ -36,12 +36,11 @@ flowchart LR
         direction TB
         subgraph PM["12 tasks, one per model"]
             direction TB
-            L["minimal pairs"] --> P["brain"] --> MM["model-to-model"] --> SE["word norms"] --> SP["readout sparsity"] --> J["joint rotation (SI)"]
+            MM["model-to-model"] ~~~ P["brain"] ~~~ L["minimal pairs"] ~~~ SE["word norms"] ~~~ J["joint rotation (SI)"] ~~~ SP["readout sparsity"]
         end
         subgraph CK["10 tasks, one per Pythia seed pair"]
             direction TB
-            T["alignment across training"]
-            RSA["RSA control (SI)"]
+            T["alignment across training"] ~~~ RSA["RSA control (SI)"]
         end
     end
     R[("result tables<br/>data/results/")]
@@ -56,12 +55,12 @@ flowchart LR
 | Step | Script |
 |---|---|
 | Submit the GPU array | `run_all_analyses.sh` (tasks listed in `pipeline/stage_all.txt`) |
-| Minimal pairs (Wug, BLiMP, hypernymy) | `LANG_selectivity.py` |
-| Brain | `PEREIRA_alignment_gpu.py` |
 | Model-to-model | `other/model_model_alignment.py` |
+| Brain | `PEREIRA_alignment_gpu.py` |
+| Minimal pairs (Wug, BLiMP, hypernymy) | `LANG_selectivity.py` |
 | Word norms (perceptual, affective) | `SEM_alignment.py` |
-| Readout sparsity | `other/sparsity_analysis.py` |
 | Joint rotation across feature tasks (SI) | `other/JOINT_optimal_features.py` |
+| Readout sparsity | `other/sparsity_analysis.py` |
 | Alignment across training / RSA control (SI) | `other/model_model_checkpoints.py` / `other/model_model_checkpoints_rsa.py` |
 | Statistics | `other/paper_stats.py` |
 | Figures | `other/make_paper_figures.py`, `other/make_aggregate_plots.py` |
