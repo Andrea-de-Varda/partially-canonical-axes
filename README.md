@@ -2,10 +2,10 @@
 
 Code and results for de Varda, D'Elia, Tuckute, Fedorenko & Khosla, *Partially canonical axes in large language model representations*.
 
-LLM hidden states are usually treated as points in a space where only directions matter: rotate the coordinate system and nothing of substance should change. We test this directly. We take a target (a unit of another LLM, a voxel in the human language network, or an interpretable linguistic feature), match it to the single LLM unit it correlates with best, and ask how that match changes when the LLM's axes are rotated. Across 12 models from six families, the model's own axes match the targets better than randomly rotated axes do, but much worse than axes rotated to fit the target. LLM coordinates are partially canonical: not arbitrary, but not fully aligned with the things we can measure either.
+LLM hidden states are usually treated as points in a space and the traditional view is that the coordinate axes are not meaningful: what matters are directions in space, and distances between representations. One prediction following this view is that you can rotate the coordinate system and nothing of substance should change. Here, we test this prediction. We take a target Y (a unit of another LLM, a voxel in the human language network, or an interpretable linguistic feature, such as concreteness), match it to the single LLM unit it correlates with best, and ask how that match changes when the LLM axes are rotated. Across 12 models from six families, the model's own axes predict the various targets better than randomly rotated axes do, but much worse than axes rotated to fit the target. LLM coordinates are partially canonical: not arbitrary, but not fully canonical either.
 
 <p align="center"><img src="docs/rotation_matching.gif" width="900" alt="Toy example: rotating the basis, re-matching the target to its best axis, and scoring on held-out stimuli"></p>
-<p align="center"><sub>A toy example in two dimensions (not data from the paper; <code>docs/make_rotation_gif.py</code>). Top: rotating the axes away from the native ones lowers the held-out correlation between the target and its best-matched axis. Bottom: rotating them towards the target raises it.</sub></p>
+<p align="center"><sub>Toy example in 2D (not data from the paper!). Top: applying random rotations to the native axes lowers the held-out correlation between the target and its best-matched axis. Bottom: rotating them towards the target increases the held-out correlation.</sub></p>
 
 ## Method
 
@@ -49,7 +49,7 @@ flowchart LR
 
 The matching and rotation code is in `privileged_axes/` (adapted from Khosla et al., 2024). `run_all_analyses.sh` submits all GPU analyses to SLURM.
 
-## Reproducing the statistics and figures (CPU, a few minutes)
+## Reproducing the statistics and figures (CPU, it only takes a few minutes)
 
 The result tables behind the paper are included in `data/results/`, so no GPU is needed for this step.
 
@@ -77,11 +77,9 @@ Every statistic reported in the paper ends up in `data/results/stats/paper_stats
 
 ## Brain data
 
-The fMRI responses are those of Pereira et al. (2018), Experiments 2 and 3, as re-analysed by the Fedorenko lab: per-session GLM effect sizes for every sentence in the 1,364 voxels of each participant's language network.
+The fMRI responses are those of Pereira et al. (2018), Experiments 2 and 3: per-session GLM effect sizes for every sentence in the 1,364 voxels of each participant's language network.
 
-`data/pereira_language.npz` (70 MB) contains these responses in the form the code reads (`pereira_data.load_pereira()`). Download it with `scripts/fetch_brain_data.sh` (asset of the [v1.0 release](https://github.com/Andrea-de-Varda/partially-canonical-axes/releases/tag/v1.0)). sha256 `d7a2f3649d59544effde6fc334945b4bd906b9a0e8ce853eca34185033d1a7ae`. If you use these data, cite Pereira et al. (2018) and this paper.
-
-A note on the Mamba brain results (`data/results/pereira_voxavg_*/pereira_*_state-spaces_mamba-*.csv`): Hugging Face's Mamba returns no embedding layer and repeats the last block, so these files were computed with that layout and then relabelled to the layer numbering used for all other models (`other/migrate_mamba_layers.py`, `layer_index.py`). That is why they have no layer 0. Rerunning the analysis gives the common numbering directly.
+`data/pereira_language.npz` (70 MB) contains these responses in the form the code reads (`pereira_data.load_pereira()`). Download it with `scripts/fetch_brain_data.sh` (asset of the [v1.0 release](https://github.com/Andrea-de-Varda/partially-canonical-axes/releases/tag/v1.0)). sha256 `d7a2f3649d59544effde6fc334945b4bd906b9a0e8ce853eca34185033d1a7ae`. If you use these data, please cite Pereira et al. (2018).
 
 ## Third-party data
 
