@@ -1,0 +1,31 @@
+# Environment of the paper's runs (Linux GPU cluster, 1x A100 80GB per job),
+# exported 2026-11-18. Versions are pinned to what produced the results.
+# Mamba runs on transformers' pure-PyTorch path (mamba-ssm is NOT installed);
+# installing mamba-ssm/causal-conv1d switches to CUDA kernels and can change
+# low-order digits.
+#   conda env create -f environment.yml && conda activate basis-alignment
+name: basis-alignment
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.19
+  - pip
+  - pip:
+      - torch==2.9.1            # CUDA 12.8 build on the cluster
+      - transformers==4.57.3
+      - tokenizers==0.22.1
+      - huggingface-hub==0.36.0
+      - accelerate==1.12.0
+      - safetensors==0.7.0
+      - sentencepiece==0.2.1
+      - geotorch==0.3.0
+      - torchmetrics==1.8.2
+      - numpy==2.2.6
+      - scipy==1.15.3
+      - scikit-learn==1.7.2
+      - pandas==2.3.3
+      - pyarrow==22.0.0         # only for the optional raw-parquet test
+      - matplotlib==3.10.8
+      - pillow==12.0.0
+      - tqdm==4.67.1
+      - pytest                  # tests only (not on the cluster)

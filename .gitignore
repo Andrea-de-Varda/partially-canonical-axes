@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+# activation caches, rotation matrices, checkpoints, model downloads
+cached_activations/
+rotations/
+*.npy
+*.pkl
+# downloaded data
+data/pereira_language.npz
+data/affective.csv
+# regenerated outputs (python other/make_paper_figures.py etc.)
+plots/

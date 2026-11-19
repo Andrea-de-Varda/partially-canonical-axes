@@ -1,0 +1,21 @@
+# Pereira-only manifest: the 12 MODEL lines of stage_all.txt,
+# without the Pythia CKPT/RSA jobs. Submit with --steps PEREIRA so each task runs
+# only its Pereira steps (expt2 + expt3, for both voxel sets top20rel and all;
+# see pipeline_stage.sh), then frees that model's disk:
+#   ./run_all_analyses.sh --manifest pipeline/stage_pereira.txt --steps PEREIRA --time 4-00:00:00
+#
+# Format: MODEL <model> <nw_lang> <nw_pereira> <nw_sem> [pereira flags...]
+# Ordered longest-first: with a concurrency cap this shortens the makespan.
+
+MODEL meta-llama/Llama-3.2-3B 1 2 2 --only_stream block --residual_only
+MODEL gpt2-xl 2 2 6 --only_stream block --residual_only
+MODEL state-spaces/mamba-790m-hf 4 6 6 --only_stream block --residual_only
+MODEL state-spaces/mamba-370m-hf 6 6 8 --only_stream block --residual_only
+MODEL gpt2-large 2 4 7 --only_stream block --residual_only
+MODEL gpt2-medium 4 4 8 --only_stream block --residual_only
+MODEL google/gemma-3-1b-pt 4 4 4 --only_stream block --residual_only
+MODEL meta-llama/Llama-3.2-1B 2 2 4 --only_stream block --residual_only
+MODEL Qwen/Qwen3-0.6B-Base 4 6 4 --only_stream block --residual_only
+MODEL state-spaces/mamba-130m-hf 8 8 8 --only_stream block --residual_only
+MODEL gpt2 4 4 8 --only_stream block --residual_only
+MODEL EleutherAI/pythia-160m 12 8 12 --only_stream block --residual_only
